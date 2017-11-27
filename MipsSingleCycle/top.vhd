@@ -5,7 +5,7 @@ entity top is -- top-level design for testing
   port(clk, reset:           in     STD_LOGIC;
        writedata, aluout:    buffer STD_LOGIC_VECTOR(31 downto 0);
        memwrite:             buffer STD_LOGIC;
-       readdata:             STD_LOGIC;
+       readdata:             STD_LOGIC_VECTOR(31 downto 0);
        srca:                 STD_LOGIC_VECTOR(31 downto 0);
        srcb:                 STD_LOGIC_VECTOR(31 downto 0);
        zero:                 STD_LOGIC;
