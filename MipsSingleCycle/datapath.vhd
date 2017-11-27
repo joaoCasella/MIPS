@@ -10,7 +10,9 @@ entity datapath is  -- MIPS datapath
        pc:                buffer STD_LOGIC_VECTOR(31 downto 0);
        instr:             in  STD_LOGIC_VECTOR(31 downto 0);
        aluout, writedata: buffer STD_LOGIC_VECTOR(31 downto 0);
-       readdata:          in  STD_LOGIC_VECTOR(31 downto 0));
+       readdata:          in  STD_LOGIC_VECTOR(31 downto 0);
+       srca, srcb:        out STD_LOGIC_VECTOR(31 downto 0)
+       );
 end;
 
 architecture struct of datapath is
@@ -50,11 +52,11 @@ architecture struct of datapath is
          y:      out STD_LOGIC_VECTOR(width-1 downto 0));
   end component;
   signal writereg:           STD_LOGIC_VECTOR(4 downto 0);
-  signal pcjump, pcnext, 
-         pcnextbr, pcplus4, 
+  signal pcjump, pcnext,
+         pcnextbr, pcplus4,
          pcbranch:           STD_LOGIC_VECTOR(31 downto 0);
   signal signimm, signimmsh: STD_LOGIC_VECTOR(31 downto 0);
-  signal srca, srcb, result: STD_LOGIC_VECTOR(31 downto 0);
+  signal s_srca, s_srcb, result: STD_LOGIC_VECTOR(31 downto 0);
 begin
   -- next PC logic
   pcjump <= pcplus4(31 downto 28) & instr(25 downto 0) & "00";
@@ -62,23 +64,26 @@ begin
   pcadd1: adder port map(pc, X"00000004", pcplus4);
   immsh: sl2 port map(signimm, signimmsh);
   pcadd2: adder port map(pcplus4, signimmsh, pcbranch);
-  pcbrmux: mux2 generic map(32) port map(pcplus4, pcbranch, 
+  pcbrmux: mux2 generic map(32) port map(pcplus4, pcbranch,
                                          pcsrc, pcnextbr);
   pcmux: mux2 generic map(32) port map(pcnextbr, pcjump, jump, pcnext);
 
   -- register file logic
-  rf: regfile port map(clk, regwrite, instr(25 downto 21), 
-                       instr(20 downto 16), writereg, result, srca, 
+  rf: regfile port map(clk, regwrite, instr(25 downto 21),
+                       instr(20 downto 16), writereg, result, s_srca,
 				writedata);
-  wrmux: mux2 generic map(5) port map(instr(20 downto 16), 
-                                      instr(15 downto 11), 
+  wrmux: mux2 generic map(5) port map(instr(20 downto 16),
+                                      instr(15 downto 11),
                                       regdst, writereg);
-  resmux: mux2 generic map(32) port map(aluout, readdata, 
+  resmux: mux2 generic map(32) port map(aluout, readdata,
                                         memtoreg, result);
   se: signext port map(instr(15 downto 0), signimm);
 
   -- ALU logic
-  srcbmux: mux2 generic map(32) port map(writedata, signimm, alusrc, 
-                                         srcb);
-  mainalu: alu port map(srca, srcb, alucontrol, aluout, zero);
+  srcbmux: mux2 generic map(32) port map(writedata, signimm, alusrc,
+                                         s_srcb);
+  mainalu: alu port map(s_srca, s_srcb, alucontrol, aluout, zero);
+
+  srca <= s_srca;
+  srcb <= s_srcb;
 end;
