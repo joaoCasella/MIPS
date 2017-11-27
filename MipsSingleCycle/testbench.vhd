@@ -9,7 +9,7 @@ architecture test of testbench is
   port(clk, reset:           in     STD_LOGIC;
        writedata, aluout:    buffer STD_LOGIC_VECTOR(31 downto 0);
        memwrite:             buffer STD_LOGIC;
-       readdata:             STD_LOGIC;
+       readdata:             STD_LOGIC_VECTOR(31 downto 0);
        srca:                 STD_LOGIC_VECTOR(31 downto 0);
        srcb:                 STD_LOGIC_VECTOR(31 downto 0);
        zero:                 STD_LOGIC;
@@ -18,10 +18,12 @@ architecture test of testbench is
   end component;
   signal writedata, dataadr:    STD_LOGIC_VECTOR(31 downto 0);
   signal clk, reset,  memwrite: STD_LOGIC;
+  signal readdata, srca, srcb:  STD_LOGIC_VECTOR(31 downto 0);
+  signal zero, pcsrc:           STD_LOGIC;
 begin
 
   -- instantiate device to be tested
-  dut: top port map(clk, reset, writedata, dataadr, memwrite);
+  dut: top port map(clk, reset, writedata, dataadr, memwrite, readdata, srca, srcb, zero, pcsrc);
 
   -- Generate clock with 10 ns period
   process begin
