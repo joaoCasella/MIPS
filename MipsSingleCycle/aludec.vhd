@@ -12,6 +12,7 @@ begin
     case aluop is
       when "00" => alucontrol <= "010"; -- add (for lw/sw/addi)
       when "01" => alucontrol <= "110"; -- sub (for beq)
+      when "11" => alucontrol <= "110"; -- sub (for bne)
       when others => case funct is      -- R-type instructions
                          when "100000" => alucontrol <= "010"; -- add 
                          when "100010" => alucontrol <= "110"; -- sub

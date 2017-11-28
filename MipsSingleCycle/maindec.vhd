@@ -18,7 +18,7 @@ begin
       when "100011" => controls <= "1010001000"; -- LW
       when "101011" => controls <= "0010010000"; -- SW
       when "000100" => controls <= "0001000001"; -- BEQ
-      when "000101" => controls <= "0000100001"; -- BNE
+      when "000101" => controls <= "0000100011"; -- BNE
       when "001000" => controls <= "1010000000"; -- ADDI
       when "000010" => controls <= "0000000100"; -- J
       when others   => controls <= "----------"; -- illegal op
