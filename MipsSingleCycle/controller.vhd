@@ -32,5 +32,5 @@ begin
                        alusrc, regdst, regwrite, jump, aluop);
   ad: aludec port map(funct, aluop, alucontrol);
 
-  pcsrc <= branch and zero;
+  pcsrc <= (branch and zero) or (aluop(1) and aluop(0) and (not zero));
 end;
