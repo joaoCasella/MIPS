@@ -6,7 +6,11 @@ entity mips is -- single cycle MIPS processor
        instr:             in  STD_LOGIC_VECTOR(31 downto 0);
        memwrite:          out STD_LOGIC;
        aluout, writedata: out STD_LOGIC_VECTOR(31 downto 0);
-       readdata:          in  STD_LOGIC_VECTOR(31 downto 0));
+       readdata:          in  STD_LOGIC_VECTOR(31 downto 0);
+       pcsrc:             out STD_LOGIC;
+       zero:              out STD_LOGIC;
+       branch:            out STD_LOGIC;
+       srca, srcb:        out STD_LOGIC_VECTOR(31 downto 0));
 end;
 
 architecture struct of mips is
@@ -18,7 +22,8 @@ architecture struct of mips is
          regdst, regwrite:   out STD_LOGIC;
          jump:               out STD_LOGIC;
          alucontrol:         out STD_LOGIC_VECTOR(2 downto 0);
-         signextend:         out STD_LOGIC);
+         signextend:         out STD_LOGIC;
+         branch:             out STD_LOGIC);
   end component;
   component datapath
     port(clk, reset:        in  STD_LOGIC;
@@ -31,16 +36,20 @@ architecture struct of mips is
          instr:             in STD_LOGIC_VECTOR(31 downto 0);
          aluout, writedata: buffer STD_LOGIC_VECTOR(31 downto 0);
          readdata:          in  STD_LOGIC_VECTOR(31 downto 0);
+         srca, srcb:        out STD_LOGIC_VECTOR(31 downto 0);
          signextend:        in STD_LOGIC);
   end component;
-  signal memtoreg, alusrc, regdst, regwrite, jump, pcsrc, s_signextend: STD_LOGIC;
-  signal zero: STD_LOGIC;
+  signal memtoreg, alusrc, regdst, regwrite, jump, s_pcsrc, s_signextend: STD_LOGIC;
+  signal s_zero: STD_LOGIC;
   signal alucontrol: STD_LOGIC_VECTOR(2 downto 0);
 begin
   cont: controller port map(instr(31 downto 26), instr(5 downto 0),
-                            zero, memtoreg, memwrite, pcsrc, alusrc,
-                            regdst, regwrite, jump, alucontrol, s_signextend);
-  dp: datapath port map(clk, reset, memtoreg, pcsrc, alusrc, regdst,
-                        regwrite, jump, alucontrol, zero, pc, instr,
-                        aluout, writedata, readdata, s_signextend);
+                            s_zero, memtoreg, memwrite, s_pcsrc, alusrc,
+                            regdst, regwrite, jump, alucontrol, s_signextend, branch);
+  dp: datapath port map(clk, reset, memtoreg, s_pcsrc, alusrc, regdst,
+                        regwrite, jump, alucontrol, s_zero, pc, instr,
+                        aluout, writedata, readdata, srca, srcb, s_signextend);
+
+  pcsrc <= s_pcsrc;
+  zero <= s_zero;
 end;
