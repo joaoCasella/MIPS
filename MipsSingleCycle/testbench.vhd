@@ -8,14 +8,22 @@ architecture test of testbench is
   component top
     port(clk, reset:           in  STD_LOGIC;
          writedata, dataadr:   out STD_LOGIC_VECTOR(31 downto 0);
-         memwrite:             out STD_LOGIC);
+         memwrite:             out STD_LOGIC;
+         readdata:             out STD_LOGIC_VECTOR(31 downto 0);
+         srca:                 out STD_LOGIC_VECTOR(31 downto 0);
+         srcb:                 out STD_LOGIC_VECTOR(31 downto 0);
+         zero:                 out STD_LOGIC;
+         branch:               out STD_LOGIC;
+         pcsrc:                out STD_LOGIC;
+         pc, instr:            out STD_LOGIC_VECTOR(31 downto 0));
   end component;
   signal writedata, dataadr:    STD_LOGIC_VECTOR(31 downto 0);
-  signal clk, reset,  memwrite: STD_LOGIC;
+  signal clk, reset, memwrite, zero, branch, pcsrc: STD_LOGIC;
+  signal readdata, srca, srcb, pc, instr: STD_LOGIC_VECTOR(31 downto 0);
 begin
 
   -- instantiate device to be tested
-  dut: top port map(clk, reset, writedata, dataadr, memwrite);
+  dut: top port map(clk, reset, writedata, dataadr, memwrite, readdata, srca, srcb, zero, branch, pcsrc, pc, instr);
 
   -- Generate clock with 10 ns period
   process begin
