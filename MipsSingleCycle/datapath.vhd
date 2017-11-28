@@ -11,8 +11,8 @@ entity datapath is  -- MIPS datapath
        instr:             in  STD_LOGIC_VECTOR(31 downto 0);
        aluout, writedata: buffer STD_LOGIC_VECTOR(31 downto 0);
        readdata:          in  STD_LOGIC_VECTOR(31 downto 0);
-       signextend:        in STD_LOGIC;
-       srca, srcb:        out STD_LOGIC_VECTOR(31 downto 0));
+       srca, srcb:        out STD_LOGIC_VECTOR(31 downto 0);
+       signextend:        in STD_LOGIC);
 end;
 
 architecture struct of datapath is
