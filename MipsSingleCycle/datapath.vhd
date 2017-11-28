@@ -10,7 +10,8 @@ entity datapath is  -- MIPS datapath
        pc:                buffer STD_LOGIC_VECTOR(31 downto 0);
        instr:             in  STD_LOGIC_VECTOR(31 downto 0);
        aluout, writedata: buffer STD_LOGIC_VECTOR(31 downto 0);
-       readdata:          in  STD_LOGIC_VECTOR(31 downto 0));
+       readdata:          in  STD_LOGIC_VECTOR(31 downto 0);
+       signextend:        in STD_LOGIC);
 end;
 
 architecture struct of datapath is
@@ -35,8 +36,9 @@ architecture struct of datapath is
     port(a: in  STD_LOGIC_VECTOR(31 downto 0);
          y: out STD_LOGIC_VECTOR(31 downto 0));
   end component;
-  component signext
+  component imextender
     port(a: in  STD_LOGIC_VECTOR(15 downto 0);
+         signextend: in STD_LOGIC;
          y: out STD_LOGIC_VECTOR(31 downto 0));
   end component;
   component flopr generic(width: integer);
@@ -75,7 +77,7 @@ begin
                                       regdst, writereg);
   resmux: mux2 generic map(32) port map(aluout, readdata, 
                                         memtoreg, result);
-  se: signext port map(instr(15 downto 0), signimm);
+  se: imextender port map(instr(15 downto 0), signextend, signimm);
 
   -- ALU logic
   srcbmux: mux2 generic map(32) port map(writedata, signimm, alusrc, 
