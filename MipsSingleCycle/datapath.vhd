@@ -10,7 +10,8 @@ entity datapath is  -- MIPS datapath
        pc:                buffer STD_LOGIC_VECTOR(31 downto 0);
        instr:             in  STD_LOGIC_VECTOR(31 downto 0);
        aluout, writedata: buffer STD_LOGIC_VECTOR(31 downto 0);
-       readdata:          in  STD_LOGIC_VECTOR(31 downto 0));
+       readdata:          in  STD_LOGIC_VECTOR(31 downto 0);
+       srca, srcb:        out STD_LOGIC_VECTOR(31 downto 0));
 end;
 
 architecture struct of datapath is
@@ -54,7 +55,7 @@ architecture struct of datapath is
          pcnextbr, pcplus4, 
          pcbranch:           STD_LOGIC_VECTOR(31 downto 0);
   signal signimm, signimmsh: STD_LOGIC_VECTOR(31 downto 0);
-  signal srca, srcb, result: STD_LOGIC_VECTOR(31 downto 0);
+  signal s_srca, s_srcb, result: STD_LOGIC_VECTOR(31 downto 0);
 begin
   -- next PC logic
   pcjump <= pcplus4(31 downto 28) & instr(25 downto 0) & "00";
@@ -68,7 +69,7 @@ begin
 
   -- register file logic
   rf: regfile port map(clk, regwrite, instr(25 downto 21), 
-                       instr(20 downto 16), writereg, result, srca, 
+                       instr(20 downto 16), writereg, result, s_srca, 
 				writedata);
   wrmux: mux2 generic map(5) port map(instr(20 downto 16), 
                                       instr(15 downto 11), 
@@ -79,6 +80,9 @@ begin
 
   -- ALU logic
   srcbmux: mux2 generic map(32) port map(writedata, signimm, alusrc, 
-                                         srcb);
-  mainalu: alu port map(srca, srcb, alucontrol, aluout, zero);
+                                         s_srcb);
+  mainalu: alu port map(s_srca, s_srcb, alucontrol, aluout, zero);
+  
+  srca <= s_srca;
+  srcb <= s_srcb;
 end;
