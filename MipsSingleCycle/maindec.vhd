@@ -11,7 +11,7 @@ entity maindec is -- main control decoder
 end;
 
 architecture behave of maindec is
-  signal controls: STD_LOGIC_VECTOR(8 downto 0);
+  signal controls: STD_LOGIC_VECTOR(9 downto 0);
 begin
   process(all) begin
     case op is
