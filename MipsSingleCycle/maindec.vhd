@@ -6,25 +6,27 @@ entity maindec is -- main control decoder
        branch, branchne, alusrc: out STD_LOGIC;
        regdst, regwrite:         out STD_LOGIC;
        jump:                     out STD_LOGIC;
-       aluop:                    out STD_LOGIC_VECTOR(1 downto 0));
+       aluop:                    out STD_LOGIC_VECTOR(1 downto 0);
+       signextend:               out STD_LOGIC);
 end;
 
 architecture behave of maindec is
-  signal controls: STD_LOGIC_VECTOR(9 downto 0);
+  signal controls: STD_LOGIC_VECTOR(10 downto 0);
 begin
   process(all) begin
     case op is
-      when "000000" => controls <= "1100000010"; -- RTYPE
-      when "100011" => controls <= "1010001000"; -- LW
-      when "101011" => controls <= "0010010000"; -- SW
-      when "000100" => controls <= "0001000001"; -- BEQ
-      when "000101" => controls <= "0000100001"; -- BNE
-      when "001000" => controls <= "1010000000"; -- ADDI
-      when "000010" => controls <= "0000000100"; -- J
-      when others   => controls <= "----------"; -- illegal op
+      when "000000" => controls <= "11000000100"; -- RTYPE
+      when "100011" => controls <= "10100010001"; -- LW
+      when "101011" => controls <= "00100100001"; -- SW
+      when "000100" => controls <= "00010000010"; -- BEQ
+      when "000101" => controls <= "00001000010"; -- BNE
+      when "001000" => controls <= "10100000001"; -- ADDI
+      when "001101" => controls <= "10100000110"; -- ORI
+      when "000010" => controls <= "00000001000"; -- J
+      when others   => controls <= "-----------"; -- illegal op
     end case;
   end process;
 
   (regwrite, regdst, alusrc, branch, branchne, memwrite,
-   memtoreg, jump, aluop(1 downto 0)) <= controls;
+   memtoreg, jump, aluop(1 downto 0), signextend) <= controls;
 end;

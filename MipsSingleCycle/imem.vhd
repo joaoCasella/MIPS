@@ -22,7 +22,7 @@ begin
       mem(i) := (others => '0'); 
     end loop;
     index := 0; 
-    FILE_OPEN(mem_file, "C:/Users/gianl/Desktop/memfile.dat", READ_MODE);
+    FILE_OPEN(mem_file, "C:/Users/amand/Desktop/memfile2.dat", READ_MODE);
     while not endfile(mem_file) loop
       readline(mem_file, L);
       result := 0;	
