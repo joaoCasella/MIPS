@@ -53,38 +53,35 @@ architecture struct of datapath is
          y:      out STD_LOGIC_VECTOR(width-1 downto 0));
   end component;
   signal writereg:           STD_LOGIC_VECTOR(4 downto 0);
-  signal pcjump, pcnext, 
-         pcnextbr, pcplus4, 
+  signal pcjump, pcnext,
+         pcnextbr, pcplus4,
          pcbranch:           STD_LOGIC_VECTOR(31 downto 0);
   signal signimm, signimmsh: STD_LOGIC_VECTOR(31 downto 0);
   signal s_srca, s_srcb, result: STD_LOGIC_VECTOR(31 downto 0);
 begin
-  -- next PC logic
-  pcjump <= pcplus4(31 downto 28) & instr(25 downto 0) & "00";
-  pcreg: flopr generic map(32) port map(clk, reset, pcnext, pc);
-  pcadd1: adder port map(pc, X"00000004", pcplus4);
-  immsh: sl2 port map(signimm, signimmsh);
-  pcadd2: adder port map(pcplus4, signimmsh, pcbranch);
-  pcbrmux: mux2 generic map(32) port map(pcplus4, pcbranch, 
-                                         pcsrc, pcnextbr);
-  pcmux: mux2 generic map(32) port map(pcnextbr, pcjump, jump, pcnext);
 
-  -- register file logic
-  rf: regfile port map(clk, regwrite, instr(25 downto 21), 
-                       instr(20 downto 16), writereg, result, s_srca, 
-				writedata);
-  wrmux: mux2 generic map(5) port map(instr(20 downto 16), 
-                                      instr(15 downto 11), 
-                                      regdst, writereg);
-  resmux: mux2 generic map(32) port map(aluout, readdata, 
-                                        memtoreg, result);
-  se: imextender port map(instr(15 downto 0), signextend, signimm);
+  -- IF
+  pcreg: flopr generic map(32) port map(clk, reset, pcnext, pc); -- definitivamente IF
+  pcadd1: adder port map(pc, X"00000004", pcplus4); -- definitivamente IF
+  pcbrmux: mux2 generic map(32) port map(pcplus4, pcbranch, pcsrc, pcnextbr);  -- creio que IF
+  pcmux: mux2 generic map(32) port map(pcnextbr, pcjump, jump, pcnext); -- creio que IF
 
-  -- ALU logic
-  srcbmux: mux2 generic map(32) port map(writedata, signimm, alusrc, 
-                                         s_srcb);
-  mainalu: alu port map(s_srca, s_srcb, alucontrol, aluout, zero);
-  
+  -- ID
+  pcjump <= pcplus4(31 downto 28) & instr(25 downto 0) & "00"; -- tava no IF, creio que possa ser ID (?)
+  rf: regfile port map(clk, regwrite, instr(25 downto 21), instr(20 downto 16),
+                       writereg, result, s_srca, writedata); -- definitivamente ID
+  se: imextender port map(instr(15 downto 0), signextend, signimm); -- definitivamente ID
+
+  -- EX
+  pcadd2: adder port map(pcplus4, signimmsh, pcbranch); -- tava no IF, é EX pelo livro
+  immsh: sl2 port map(signimm, signimmsh); -- tava no IF, é EX pelo livro
+  wrmux: mux2 generic map(5) port map(instr(20 downto 16), instr(15 downto 11), regdst, writereg); -- tava no ID, é EX pelo livro
+  srcbmux: mux2 generic map(32) port map(writedata, signimm, alusrc, s_srcb); -- definitivamente EX
+  mainalu: alu port map(s_srca, s_srcb, alucontrol, aluout, zero); -- definitivamente EX
+
+  -- WB (sim)
+  resmux: mux2 generic map(32) port map(aluout, readdata, memtoreg, result); --tava no ID, é WB pelo livro
+
   srca <= s_srca;
   srcb <= s_srcb;
 end;
