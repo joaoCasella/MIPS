@@ -5,12 +5,15 @@ entity regidex is -- ID/EX register
   port(clk:                        in   STD_LOGIC;
        pcplus4_id, signimm_id:     in   STD_LOGIC_VECTOR(31 downto 0);
 	   readdata1_id, readdata2_id: in   STD_LOGIC_VECTOR(31 downto 0);
-	   pcplus4_ex, signimm_ex:     out   STD_LOGIC_VECTOR(31 downto 0);
-	   readdata1_ex, readdata2_ex: out   STD_LOGIC_VECTOR(31 downto 0));
+	   ifidrt, ifidrd:             in   STD_LOGIC_VECTOR(4 downto 0);
+	   pcplus4_ex, signimm_ex:     out  STD_LOGIC_VECTOR(31 downto 0);
+	   readdata1_ex, readdata2_ex: out  STD_LOGIC_VECTOR(31 downto 0);
+	   idexrt, idexrd:             out  STD_LOGIC_VECTOR(4 downto 0));
 end;
 
 architecture behave of regidex is
   signal pcplus4, signimm, readdata1, readdata2: STD_LOGIC_VECTOR(31 downto 0);
+  signal rt, rd: STD_LOGIC_VECTOR(4 downto 0);
 begin
   process(clk) begin
     if rising_edge(clk) then
@@ -18,10 +21,14 @@ begin
 	   signimm_ex   <= signimm;
 	   readdata1_ex <= readdata1;
 	   readdata2_ex <= readdata2;
+	   idexrt       <= rt;
+	   idexrd       <= rd;
 	   pcplus4      <= pcplus4_id;
 	   signimm      <= signimm_id;
 	   readdata1    <= readdata1_id;
 	   readdata2    <= readdata2_id;
+	   rt           <= ifidrt;
+	   rd           <= ifidrd;
     end if;
   end process;
 end;
