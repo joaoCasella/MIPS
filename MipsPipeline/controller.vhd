@@ -9,7 +9,8 @@ entity controller is -- single cycle control decoder
        jump:               out STD_LOGIC;
        alucontrol:         out STD_LOGIC_VECTOR(2 downto 0);
        signextend:         out STD_LOGIC;
-       branch:             out STD_LOGIC);
+       branch:             out STD_LOGIC;
+       branchne:           out STD_LOGIC);
 end;
 
 
@@ -30,12 +31,13 @@ architecture struct of controller is
   end component;
 
   signal aluop:            STD_LOGIC_VECTOR(1 downto 0);
-  signal s_branch, branchne: STD_LOGIC;
+  signal s_branch, s_branchne: STD_LOGIC;
 begin
-  md: maindec port map(op, memtoreg, memwrite, s_branch, branchne,
+  md: maindec port map(op, memtoreg, memwrite, s_branch, s_branchne,
                        alusrc, regdst, regwrite, jump, aluop, signextend);
   ad: aludec port map(funct, aluop, alucontrol);
 
-  pcsrc <= (s_branch and zero) or (branchne and (not zero));
+  pcsrc <= (s_branch and zero) or (s_branchne and (not zero));
   branch <= s_branch;
+  branchne <= s_branchne;
 end;
